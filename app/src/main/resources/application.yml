@@ -1,0 +1,125 @@
+oath2-server.documentaion-url: https://github.com/klimenkoOleg/oauth2-server
+
+
+
+
+springfox:
+  documentation:
+    service-version: 1
+
+# NEEDED since Boot 2.x!
+# Charset of HTTP requests and responses. Added to the "Content-Type"
+# header if not set explicitly.
+spring.http.encoding.charset: UTF-8
+# Enable http encoding support.
+spring.http.encoding.enabled: true
+# Force the encoding to the configured charset on HTTP requests and responses.
+spring.http.encoding.force: true
+
+logging:
+  level:
+    root: INFO
+    org.springframework.web: INFO
+    org.springframework.web.HttpLogging: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.security.oauth2: DEBUG
+    org.springframework.cloud.gateway: DEBUG
+    orgspringframework.cloud: DEBUG
+
+logging.level.org.springframework.security.web.access.intercept.FilterSecurityInterceptor: DEBUG
+logging.level.web: DEBUG
+
+#baseUrl: localhost:8080
+
+spring:
+  application:
+    name: spring-gateway
+  autoconfigure:
+    # TODO: remove when fixed https://github.com/spring-projects/spring-security/issues/6314
+    exclude: org.springframework.boot.actuate.autoconfigure.security.reactive.ReactiveManagementWebSecurityAutoConfiguration
+  thymeleaf:
+    cache: false
+
+  gateway:
+    routes:
+      - id: customer-service
+        predicates:
+          - Path=/app/**
+        uri: http://localhost:8081
+        filters:
+          - PreOauth2SSOGatewayFilter
+
+  security:
+    oauth2:
+      client:
+        registration:
+          uaa:
+            client-id: client
+            client-secret: secret
+            authorization-grant-type: client_credentials
+        provider:
+          uaa:
+            token-uri: http://localhost:8081/oauth/token
+
+#  security:
+#    oauth2:
+#      client:
+#        registration:
+#          gateway:
+#            provider: uaa
+#            client-id: client
+#            client-secret: secret
+#            authorization-grant-type: password
+#            client-authentication-method: basic
+
+                      #            authorization-grant-type: client_credentials
+                      #            authorization-grant-type: authorization_code
+#            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+                      #            redirect-uri-template: "{baseUrl}/login/oauth2/code"
+#            scope: openid,profile,email,resource.read
+                      #            scope: openid,profile,email,resource.read
+#        provider:
+#          uaa:
+                        #            authorization-uri: http://localhost:8080/oauth/authorize
+#            token-uri: http://localhost:8081/oauth/token
+                    #            token-uri: http://localhost:8444/oauth/token
+#            user-info-uri: http://localhost:8081/oauth/user
+#            user-name-attribute: user_name
+#            user-info-authentication-method: header
+                        #            user-info-uri: http://localhost:8081/userinfo
+                        #            user-name-attribute: sub
+                        #            jwk-set-uri: http://localhost:8081/token_keys
+                        #              token-uri: http://uaa:8090/uaa/oauth/token
+                        #            user-info-uri: http://uaa:8090/uaa/userinfo
+                        #            user-name-attribute: sub
+                        #            jwk-set-uri: http://uaa:8090/uaa/token_keys
+
+                        #  cloud:
+                        #    gateway:
+                        #      routes:
+                        #        - id: resource
+                        #          uri: http://resource:9000
+                        #          predicates:
+                        #            - Path=/resource
+                        #          filters:
+                        #            - TokenRelay=
+                        #            - RemoveRequestHeader=Cookie
+
+                        #security:
+                        #  oauth2:
+                        #    resource:
+                        #      filter-order: 3
+                        #    client:
+                        #      authenticationScheme: header
+                        #
+                        #oauth2:
+                        #  paths:
+                        #    token: /v1/oauth2/token
+                        #    check_token: /v1/oauth2/check_token
+                        #    token_key: /v1/oauth2/token_key
+                        #    authorize: /v1/oauth2/authorize
+                        #    confirm_access: /v1/oauth2/confirm_access
+                        #  keystore_file_uri: key/mykey.jks
+                        #  keystore_password: $ampl3
+                        #  keystore_alias: mykey
+                        #  custom_token_field_name: custom_field
